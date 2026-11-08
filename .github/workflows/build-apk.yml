@@ -21,6 +21,7 @@ jobs:
           java-version: '17'
 
       - name: Build APK
+        working-directory: ./Mal3ab
         run: |
           chmod +x gradlew || true
           if [ -f gradlew ]; then
@@ -33,4 +34,6 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: Mal3ab-debug-apk
-          path: '**/build/outputs/apk/debug/*.apk'
+          path: 'Mal3ab/**/build/outputs/apk/debug/*.apk'
+          if-no-files-found: error
+        
