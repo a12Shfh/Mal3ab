@@ -1,4 +1,5 @@
 
+
 package com.mal3ab.app;
 
 import android.app.Activity;
@@ -10,11 +11,7 @@ import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.ScrollView;
-import android.widget.ImageView;
-import android.webkit.WebView;
-import android.webkit.WebViewClient;
-import android.content.Intent;
-import android.net.Uri;
+import android.widget.Toast;
 
 public class MainActivity extends Activity {
 
@@ -22,19 +19,20 @@ public class MainActivity extends Activity {
     int dark = Color.rgb(13, 18, 16);
     int cardColor = Color.rgb(28, 38, 33);
 
-    String officialUrl = "";
-
     LinearLayout page;
+    TextView matchesText;
+    TextView resultsText;
+    TextView statusText;
+
+    String serverUrl = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         showHome();
     }
 
     void showHome() {
-
         ScrollView scroll = new ScrollView(this);
 
         page = new LinearLayout(this);
@@ -53,46 +51,31 @@ public class MainActivity extends Activity {
         TextView subtitle = new TextView(this);
         subtitle.setText("عالم كرة القدم بين يديك");
         subtitle.setTextColor(Color.WHITE);
-        subtitle.setTextSize(18);
+        subtitle.setTextSize(17);
         subtitle.setGravity(Gravity.CENTER);
-        subtitle.setPadding(0, 10, 0, 20);
+        subtitle.setPadding(0, 10, 0, 25);
         page.addView(subtitle);
 
-        section("🏟️ واجهة ملعب",
-                "مرحباً بك في تطبيق ملعب الرياضي");
+        statusText = addSection("حالة الاتصال",
+                "بانتظار إعداد خادم بيانات المباريات");
 
-        section("⚽ المباريات القادمة",
-                "ستظهر المواعيد عند ربط مصدر بيانات المباريات.");
+        addSection("🏆 البطولات",
+                "الدوري الإنجليزي\nالدوري الإسباني\nالدوري الألماني\nدوري أبطال أوروبا");
 
-        section("📊 النتائج المباشرة",
-                "تابع نتائج المباريات بعد ربط مصدر النتائج.");
+        matchesText = addSection("⚽ المباريات القادمة",
+                "سيتم عرض المباريات هنا بعد ربط الخادم.");
 
-        section("🏆 البطولات",
-                "الدوريات العالمية والعربية والعراقية.");
+        resultsText = addSection("📊 النتائج",
+                "سيتم عرض النتائج هنا بعد ربط الخادم.");
 
-        section("❤️ الفرق المفضلة",
-                "قريباً يمكنك متابعة فرقك المفضلة.");
+        addSection("❤️ المفضلة",
+                "متابعة الفرق المفضلة قريباً.");
 
-        section("📺 مشاهدة المباريات",
-                "شاهد المباريات من خلال المصادر الرسمية.");
-
-        addButton("مشاهدة داخل التطبيق", () -> {
-            if (officialUrl.isEmpty()) {
-                message("أضف رابط بث رسمي أولاً.");
+        addButton("🔄 تحديث المباريات", () -> {
+            if (serverUrl.isEmpty()) {
+                message("ربط خادم البيانات لم يكتمل بعد.");
             } else {
-                showVideo(officialUrl);
-            }
-        });
-
-        addButton("مشاهدة خارج التطبيق", () -> {
-            if (officialUrl.isEmpty()) {
-                message("أضف رابط بث رسمي أولاً.");
-            } else {
-                Intent intent = new Intent(
-                    Intent.ACTION_VIEW,
-                    Uri.parse(officialUrl)
-                );
-                startActivity(intent);
+                message("سيتم تفعيل التحديث بعد إعداد الخادم.");
             }
         });
 
@@ -100,8 +83,7 @@ public class MainActivity extends Activity {
         setContentView(scroll);
     }
 
-    void section(String heading, String detail) {
-
+    TextView addSection(String heading, String detail) {
         LinearLayout card = new LinearLayout(this);
         card.setOrientation(LinearLayout.VERTICAL);
         card.setPadding(18, 18, 18, 18);
@@ -118,18 +100,18 @@ public class MainActivity extends Activity {
         d.setText(detail);
         d.setTextColor(Color.WHITE);
         d.setTextSize(15);
-        d.setPadding(0, 10, 0, 0);
+        d.setPadding(0, 12, 0, 0);
         card.addView(d);
 
         LinearLayout.LayoutParams params =
-            new LinearLayout.LayoutParams(-1, -2);
-
+                new LinearLayout.LayoutParams(-1, -2);
         params.setMargins(0, 10, 0, 10);
+
         page.addView(card, params);
+        return d;
     }
 
     void addButton(String text, Runnable action) {
-
         TextView button = new TextView(this);
         button.setText(text);
         button.setTextColor(Color.WHITE);
@@ -139,34 +121,14 @@ public class MainActivity extends Activity {
         button.setBackgroundColor(green);
 
         LinearLayout.LayoutParams params =
-            new LinearLayout.LayoutParams(-1, -2);
+                new LinearLayout.LayoutParams(-1, -2);
+        params.setMargins(0, 12, 0, 12);
 
-        params.setMargins(0, 8, 0, 8);
         page.addView(button, params);
-
         button.setOnClickListener(v -> action.run());
     }
 
-    void showVideo(String url) {
-
-        WebView web = new WebView(this);
-        web.getSettings().setJavaScriptEnabled(true);
-        web.getSettings().setDomStorageEnabled(true);
-        web.setWebViewClient(new WebViewClient());
-        web.loadUrl(url);
-
-        setContentView(web);
-    }
-
     void message(String text) {
-        android.widget.Toast.makeText(
-            this, text, android.widget.Toast.LENGTH_LONG
-        ).show();
-    }
-
-    @Override
-    public void onBackPressed() {
-        showHome();
+        Toast.makeText(this, text, Toast.LENGTH_LONG).show();
     }
 }
-
